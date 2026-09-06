@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:devfinance;MODE=PostgreSQL;DB_CLOSE_DELAY=-1}
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:creditradar;MODE=PostgreSQL;DB_CLOSE_DELAY=-1}
     username: ${SPRING_DATASOURCE_USERNAME:sa}
     password: ${SPRING_DATASOURCE_PASSWORD:}
   jpa:
@@ -17,4 +17,4 @@ management:
         include: health,info
 info:
   app:
-    name: DevFinance API
+    name: Credit Radar API

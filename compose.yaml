@@ -2,12 +2,12 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: devfinance
-      POSTGRES_USER: devfinance
-      POSTGRES_PASSWORD: devfinance
+      POSTGRES_DB: creditradar
+      POSTGRES_USER: creditradar
+      POSTGRES_PASSWORD: creditradar
     ports: ["5432:5432"]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U devfinance -d devfinance"]
+      test: ["CMD-SHELL", "pg_isready -U creditradar -d creditradar"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -16,9 +16,9 @@ services:
   api:
     build: ./backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/devfinance
-      SPRING_DATASOURCE_USERNAME: devfinance
-      SPRING_DATASOURCE_PASSWORD: devfinance
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/creditradar
+      SPRING_DATASOURCE_USERNAME: creditradar
+      SPRING_DATASOURCE_PASSWORD: creditradar
     ports: ["8080:8080"]
     depends_on:
       db:

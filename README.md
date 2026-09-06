@@ -1,6 +1,6 @@
-# DevFinance
+# Credit Radar
 
-Aplicação full stack de controle financeiro pessoal, pensada como peça de portfólio. Demonstra uma API REST em Java/Spring Boot, interface React/TypeScript, PostgreSQL, containers Docker e infraestrutura AWS declarada em Terraform.
+Aplicação full stack para acompanhar fundos listados de crédito. A primeira carteira reúne FIIs de papel, Fiagro e FI-Infra, permitindo investigar a exposição a CRIs, CRAs, debêntures e, quando necessário, cotas de fundos de crédito.
 
 ## Arquitetura
 
@@ -20,10 +20,10 @@ Abra `http://localhost:5173`. A API fica em `http://localhost:8080/api` e o Actu
 
 ## Funcionalidades
 
-- Cadastro de receitas e despesas
-- Categorias e filtros por mês
-- Resumo com saldo, receitas, despesas e gastos por categoria
-- Dados de demonstração carregados na primeira execução
+- Carteira inicial: KNCR11, MXRF11, CPTS11, IRIM11, RURA11, BISE11 e ISNN11
+- Modelo unificado para CRI, CRA, debênture e cota de fundo
+- API para listar ativos e posições de crédito
+- Base preparada para importar informes da CVM e relatórios gerenciais
 
 ## Próximos passos para produção
 
