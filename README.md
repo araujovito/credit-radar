@@ -25,6 +25,10 @@ Abra `http://localhost:5173`. A API fica em `http://localhost:8080/api` e o Actu
 - API para listar ativos e posições de crédito
 - Base preparada para importar informes da CVM e relatórios gerenciais
 
+## Primeiro documento importado
+
+O projeto inclui uma importação manual de referência: a Carta do Gestor do KNCR11 de novembro de 2024. As duas posições registradas representam **novas operações reportadas naquele documento**, e não a carteira completa do fundo. Cada posição mantém a URL e a data do documento de origem.
+
 ## Próximos passos para produção
 
 Em `infra/` há a base para executar a API em ECS Fargate e usar RDS PostgreSQL. Antes de aplicar, preencha as variáveis sensíveis por um gerenciador de segredos e revise rede, domínio e custos.
