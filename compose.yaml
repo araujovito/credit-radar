@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: devfinance
+      POSTGRES_USER: devfinance
+      POSTGRES_PASSWORD: devfinance
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devfinance -d devfinance"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes: [postgres-data:/var/lib/postgresql/data]
+
+  api:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/devfinance
+      SPRING_DATASOURCE_USERNAME: devfinance
+      SPRING_DATASOURCE_PASSWORD: devfinance
+    ports: ["8080:8080"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    ports: ["5173:80"]
+    depends_on: [api]
+
+volumes:
+  postgres-data:
