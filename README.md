@@ -27,7 +27,9 @@ Abra `http://localhost:5173`. A API fica em `http://localhost:8080/api` e o Actu
 
 ## Primeiro documento importado
 
-O projeto inclui uma importação manual de referência: a Carta do Gestor do KNCR11 de novembro de 2024. As duas posições registradas representam **novas operações reportadas naquele documento**, e não a carteira completa do fundo. Cada posição mantém a URL e a data do documento de origem.
+O projeto inclui uma importação manual histórica da Carta do Gestor do KNCR11 de novembro de 2024. As duas posições registradas representam **novas operações reportadas naquele documento**, e não a carteira completa do fundo.
+
+A fotografia mais recente é o relatório gerencial de julho de 2026, publicado em agosto no Fundos.NET/B3: 83,6% em ativos-alvo, 12,7% em LCI e 3,7% em caixa. Cada registro mantém a URL e a data do documento de origem.
 
 ## Próximos passos para produção
 
