@@ -17,6 +17,20 @@ página renderizada não serve como fonte. O caminho que funcionou foi ir à cam
   As URLs dos documentos são assinadas e expiram, então download e extração precisam ser feitos
   na mesma sessão.
 
+- **Província Securitizadora** — o portal é ASP.NET WebForms. A grade de emissões é HTML servido
+  inteiro; o detalhe fica em `Detalheemissao?id=<id interno>`, e o termo sai de um postback com
+  `ddlTipoanexo` no `FileHandler.ashx`.
+- **Oliveira Trust** — `services-ft.oliveiratrust.com.br/app/v1/titulos?busca=<código IF>` devolve a
+  ficha completa do papel, incluindo garantias descritas por extenso, status de adimplência e as
+  pendências que motivaram esse status.
+- **VERT** — o portal de dados exige autenticação. O caminho aberto foi o Relatório Anual do Agente
+  Fiduciário, e a própria VERT tem a Vórtx como agente fiduciário, então a operação também está na
+  API pública da Vórtx.
+
+A busca da Vórtx (`/investidor/dcm?busca=<termo ou código IF>`) resolve o código IF para o id
+numérico da operação, que é o que as demais rotas da API pedem. Foi assim que apareceram Torre
+Almirante e Eldorado, que estavam catalogados aqui sob outros agentes.
+
 Os PDFs foram convertidos com `pdftotext -layout` e as definições lidas direto da cláusula 1.
 
 ## O que foi confirmado
@@ -77,16 +91,98 @@ importa para o crédito são as categorias que recaem sobre o **devedor** e sobr
 "Razão de Garantia" e "Formalização de Garantia". Por isso as contagens acima estão quebradas
 por categoria e não somadas em um número único.
 
+
+### 5. "Ed. Eldorado" (24E1127893) — não existe devedora única
+
+O termo da 279ª emissão da Opea define como Devedor **os locatários dos Contratos de Locação** do
+Eldorado Business Tower. Não há SPE nem devedora corporativa: o risco é pulverizado entre os
+inquilinos. O cedente é o **EBT FII (CNPJ 21.085.863/0001-89)**. O imóvel é a fração ideal de 51%
+de unidades autônomas do Eldorado Business Tower, Centro Empresarial Rebouças, Av. das Nações
+Unidas 8.501 (matrículas 118.281 a 118.313, 10º RI de São Paulo).
+
+A relação dos locatários está no Anexo IX, que não consta da versão pública do termo — por isso o
+CNPJ segue "A confirmar". R$ 101,45 mi, CDI + 1,85%, bullet, vencimento em 15/03/2033. Adimplente,
+com 11 obrigações vencidas em aberto entre 31/03/2025 e 28/08/2026.
+
+Ponto de atenção: as garantias são **compartilhadas com os CRI Eldorado Anterior** (193ª e 204ª
+séries da 1ª emissão da mesma emissora), e existem ainda os CRI Eldorado Subordinada (194ª e 205ª).
+A cobertura desta série não é exclusiva dela.
+
+O agente fiduciário é a Vórtx, não a Guide: a fonte antiga era uma página genérica de ofertas.
+
+### 6. "HGBS — Bauru Shopping" (25L3678075) — devedora é um FII listado
+
+Devedora: **Hedge Brasil Shopping FII, o HGBS11 (CNPJ 08.431.747/0001-06)**, administrado pela Hedge
+Investments DTVM, que também é coordenadora líder da oferta. Emissora: Companhia Província de
+Securitização. Cedente: **Pátria Malls FII (CNPJ 26.499.833/0001-32)**. O lastro é o preço de
+aquisição devido pelo HGBS11 pela fração do Shopping Bauru.
+
+Série 2 de duas: R$ 65,086 mi dos R$ 91,455 mi da emissão, CDI + 1,60%, vencimento em 20/12/2028,
+sem agência de rating.
+
+Ponto de atenção nas garantias: além da alienação fiduciária de 35% do Shopping Bauru (titularidade
+da Vértico Bauru), boa parte da garantia são **cotas de outros FIIs do mesmo gestor** — 282.051
+cotas do HPDP11 e 1.969.834 do FLRP11, ambas de titularidade da própria devedora. Garantia e
+devedora ficam correlacionadas.
+
+### 7. "BRCR — Torre Almirante" (21L0729901) — série errada na base, e a fonte apontava para outro papel
+
+O código é da 64ª emissão **1ª série**, não 2ª. A 2ª série é outra operação: 21L0730156, R$ 150 mi,
+IPCA + 7,10%, vencimento em 2036. Os números que já estavam aqui (R$ 95 mi, CDI + 2,60%, vencimento
+em 20/12/2033) são os da 1ª série, então só o rótulo da série estava errado.
+
+Devedor: **FII Prime Portfólio (CNPJ 10.427.246/0001-06)**, administrado pelo BTG Pactual Serviços
+Financeiros. Cedente: **TA FII (CNPJ 21.085.472/0001-64)**. Imóvel: fração ideal de 60% da Torre
+Almirante (Av. Almirante Barroso 81) e do Edifício Garagem (Av. Graça Aranha 327), no Rio de
+Janeiro, matrículas 52.221 a 52.256 do 7º Ofício de RI. Garantias: alienação fiduciária de cotas,
+cessão fiduciária de direitos creditórios, Fundo de Reserva e Fundo de Despesas.
+
+**Adimplente e com zero obrigações vencidas em aberto**, confirmado no cadastro da Vórtx e no
+Relatório Anual do Agente Fiduciário 2025 da VERT.
+
+A fonte que estava registrada aqui (`RA_2023_CRA_SAO_MARTINHO_II...`) é o relatório de um CRA da
+São Martinho, sem nenhuma relação com esta operação. Foi substituída.
+
+### 8. "HSLG — BTS Meli" (24H2231337) — a Oliveira Trust classifica como INADIMPLENTE
+
+A ficha pública da Oliveira Trust marca o status da operação como **INADIMPLENTE**, listando como
+pendências relatório gerencial, relatório mensal, **relatório de obras** e **índice financeiro**.
+Nenhuma delas é falha de pagamento, mas a exigência de relatório de obras sugere empreendimento
+ainda em execução, e o índice financeiro em aberto impede aferir a cobertura.
+
+Volume corrigido: a série é de **R$ 55 mi**, não R$ 40 mi como constava aqui; a emissão total, em
+três séries, soma R$ 165 mi. CDI + 2,25%, emissão em 28/08/2024, vencimento em 28/04/2034.
+
+Garantias: alienação fiduciária dos imóveis Araucária e Arujá; cessão fiduciária dos aluguéis do
+Contrato de Locação Araucária, na proporção da fração ideal de 56,18% do Empreendimento Araucária
+detida pelo fiduciante e sujeita ao Evento de Integração Araucária; promessa de cessão dos aluguéis
+do Empreendimento Arujá para manter o Índice Mínimo de Cobertura; Fundo de Reserva; seguro
+patrimonial e de lucros cessantes.
+
+A devedora segue "A confirmar": o termo não está em área aberta e a ficha não a nomeia.
+
 ## O que ainda falta
 
-Quatro operações continuam sem termo localizado em fonte aberta:
+Duas devedoras continuam sem identificação, por ausência de termo em fonte aberta:
 
-| Operação | Código IF | Onde procurar |
+| Operação | Código IF | O que falta |
 | --- | --- | --- |
-| Ed. Eldorado | 24E1127893 | Opea, 279ª emissão 1ª série — portal atrás de Cloudflare |
-| HGBS — Bauru Shopping | 25L3678075 | Província Securitizadora, 138ª emissão 2ª série |
-| BRCR — Torre Almirante | 21L0729901 | VERT, 64ª emissão 2ª série |
-| HSLG — BTS Meli | 24H2231337 | Riza/Virgo 199ª emissão 2ª série, agente Oliveira Trust |
+| CPOF — Ed. FL Plaza | 25B3552756 | Termo da 250ª emissão da Riza; a Vórtx só publica o resumo |
+| HSLG — BTS Meli | 24H2231337 | Termo da 199ª emissão da Riza; a Oliveira Trust só publica a ficha |
 
-Também faltam, para as quatro já mapeadas, as demonstrações financeiras das devedoras e os
-relatórios de garantia que sustentam a razão de cobertura.
+O Ed. Eldorado tem devedora identificada por natureza — são os locatários — mas a lista nominal
+depende do Anexo IX, ausente da versão pública do termo.
+
+Faltam ainda, para todas as oito, as demonstrações financeiras das devedoras e os relatórios de
+garantia que sustentam a razão de cobertura. Para Torre Almirante esses documentos existem na área
+aberta da Vórtx (laudo, organograma, DFP e relatório de garantias) e são o próximo alvo natural.
+
+## Correções que a leitura produziu na base
+
+| Operação | O que estava registrado | O que o documento diz |
+| --- | --- | --- |
+| TRX — O Parque | operação de escritórios "O Parque" | CRI Sírio-Libanês, locação atípica hospitalar |
+| BRCR — Torre Almirante | 64ª emissão, 2ª série | 64ª emissão, 1ª série |
+| BRCR — Torre Almirante | fonte = relatório de um CRA da São Martinho | termo da 64ª emissão + RA 2025 da VERT |
+| Ed. Eldorado | fonte = página de ofertas da Guide | termo da 279ª emissão na Vórtx |
+| HSLG — BTS Meli | R$ 40,0 mi emitidos | R$ 55,0 mi na série, R$ 165 mi na emissão |
