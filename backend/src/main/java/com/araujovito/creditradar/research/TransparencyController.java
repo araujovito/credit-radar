@@ -7,57 +7,94 @@ import java.util.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController @RequestMapping("/api/analytics/transparency") public class TransparencyController {
+ /** Eixos que se repetem no tempo têm cadência; os que descrevem a operação uma vez, não. */
  private static final List<Axis> AXES=List.of(
-  new Axis("debtor","Devedora","Dá para nomear a devedora e o CNPJ em documento primário?"),
-  new Axis("term","Termo","O termo de securitização está em área aberta?"),
-  new Axis("guarantees","Garantias","As garantias estão descritas em documento primário, e não só listadas em cadastro?"),
-  new Axis("coverage","Cobertura","Há LTV ou índice de cobertura publicado, e recente, para aferir a garantia? Uma apuração com mais de 18 meses vale como parcial."),
-  new Axis("financials","Demonstrações","Há demonstrações financeiras da devedora?"),
-  new Axis("monitoring","Acompanhamento","Há acompanhamento periódico público, recente e regular? Informe com mais de 6 meses, ou cadência abaixo de metade do exigido, vale como parcial."));
+  new Axis("debtor","Devedora","Dá para nomear a devedora e o CNPJ em documento primário?",false),
+  new Axis("term","Termo","O termo de securitização está em área aberta?",false),
+  new Axis("guarantees","Garantias","As garantias estão descritas em documento primário, e não só listadas em cadastro?",false),
+  new Axis("coverage","Cobertura","Há apuração de LTV ou índice de cobertura publicada, recente e na periodicidade exigida?",true),
+  new Axis("financials","Demonstrações","Há demonstrações financeiras da devedora, do exercício mais recente?",true),
+  new Axis("monitoring","Acompanhamento","Há acompanhamento periódico público, recente e regular?",true));
+
  private final TransparencyScoreRepository scores;
- public TransparencyController(TransparencyScoreRepository scores){this.scores=scores;}
+ private final AxisCadenceRepository cadences;
+ public TransparencyController(TransparencyScoreRepository scores,AxisCadenceRepository cadences){this.scores=scores;this.cadences=cadences;}
 
  @GetMapping public Report report(){
   var today=LocalDate.now();
   var rows=scores.findAll().stream().sorted(Comparator.comparing(TransparencyScore::getAmountMillions).reversed()).toList();
   if(rows.isEmpty())return new Report(AXES,List.of(),null);
+
+  var bySlug=new HashMap<String,Map<String,AxisCadence>>();
+  for(var cadence:cadences.findAll())
+   bySlug.computeIfAbsent(cadence.getSlug(),key->new HashMap<>()).put(cadence.getAxis(),cadence);
+
+  var ops=new ArrayList<Operation>();
+  for(var row:rows){
+   var perAxis=bySlug.getOrDefault(row.getSlug(),Map.of());
+   var levels=new LinkedHashMap<String,Integer>();
+   var detail=new LinkedHashMap<String,Cadence>();
+   var points=0;
+   for(var axis:AXES){
+    var raw=row.rawLevel(axis.key());
+    var cadence=perAxis.get(axis.key());
+    var effective=cadence!=null&&raw>1&&cadence.capsToPartial(today)?1:raw;
+    levels.put(axis.key(),effective);
+    points+=effective;
+    if(cadence!=null)detail.put(axis.key(),describe(cadence,today));
+   }
+   ops.add(new Operation(row.getSlug(),row.getOperationName(),row.getCreditCode(),row.getAmountMillions(),
+     levels,detail,points,TransparencyScore.percentOf(points),row.getGapNote()));
+  }
+
   var total=rows.stream().map(TransparencyScore::getAmountMillions).reduce(BigDecimal.ZERO,BigDecimal::add);
-  var ops=rows.stream().map(s->new Operation(s.getSlug(),s.getOperationName(),s.getCreditCode(),s.getAmountMillions(),
-    Map.of("debtor",s.getDebtor(),"term",s.getTerm(),"guarantees",s.getGuarantees(),"coverage",s.getEffectiveCoverage(today),"financials",s.getFinancials(),"monitoring",s.getEffectiveMonitoring(today)),
-    s.getPoints(today),s.getPercent(today),s.getGapNote(),
-    new Dated(s.getCoverageAsOf(),s.getCoverageAgeMonths(today),s.isCoverageStale(today)),
-    new Monitoring(s.getMonitoringAsOf(),s.getMonitoringAgeMonths(today),s.isMonitoringStale(today),
-     s.getMonitoringPublished12m(),s.getMonitoringExpected12m(),s.getMonitoringRegularity()==null?null:pct(s.getMonitoringRegularity()),s.isMonitoringIrregular()))).toList();
-  var weighted=rows.stream().map(s->s.getAmountMillions().multiply(BigDecimal.valueOf(s.getPoints(today))))
+  var weighted=ops.stream().map(op->op.amountMillions().multiply(BigDecimal.valueOf(op.points())))
     .reduce(BigDecimal.ZERO,BigDecimal::add)
     .multiply(BigDecimal.valueOf(100)).divide(total.multiply(BigDecimal.valueOf(TransparencyScore.MAX)),0,RoundingMode.HALF_UP);
-  var simple=BigDecimal.valueOf(rows.stream().mapToInt(s->s.getPoints(today)).sum()*100L)
-    .divide(BigDecimal.valueOf((long)rows.size()*TransparencyScore.MAX),0,RoundingMode.HALF_UP);
-  var measured=rows.stream().filter(TransparencyScore::isMonitoringMeasured).toList();
-  var published=measured.stream().mapToInt(TransparencyScore::getMonitoringPublished12m).sum();
-  var expected=measured.size()*TransparencyScore.MONITORING_EXPECTED_PER_YEAR;
-  var cadence=new Cadence(published,expected,pct(expected==0?0:(double)published/expected),
-    (int)measured.stream().filter(s->s.getMonitoringPublished12m()==0).count(),
-    (int)rows.stream().filter(TransparencyScore::isMonitoringIrregular).count(),measured.size());
-  var portfolio=new Portfolio(rows.size(),total,simple,weighted,cadence,
-    exposure(rows,s->s.getDebtor()==0,total),exposure(rows,s->s.getCoverage()>0,total),exposure(rows,s->s.getTerm()==0,total),exposure(rows,s->s.isCoverageStale(today),total),exposure(rows,s->s.isMonitoringStale(today),total),exposure(rows,TransparencyScore::isMonitoringIrregular,total));
+  var simple=BigDecimal.valueOf(ops.stream().mapToInt(Operation::points).sum()*100L)
+    .divide(BigDecimal.valueOf((long)ops.size()*TransparencyScore.MAX),0,RoundingMode.HALF_UP);
+
+  var byAxis=new LinkedHashMap<String,AxisSummary>();
+  for(var axis:AXES){
+   if(!axis.recurring())continue;
+   var measured=cadences.findAll().stream().filter(c->c.getAxis().equals(axis.key())&&c.isMeasured()).toList();
+   var expected=measured.stream().mapToInt(AxisCadence::getExpectedPerYear).sum();
+   var published=measured.stream().mapToInt(AxisCadence::getPublished12m).sum();
+   byAxis.put(axis.key(),new AxisSummary(axis.label(),measured.size(),rows.size()-measured.size(),published,expected,
+     expected==0?null:pct((double)published/expected)));
+  }
+
+  var portfolio=new Portfolio(rows.size(),total,simple,weighted,byAxis,
+    exposure(ops,op->op.levels().get("debtor")==0,total),
+    exposure(ops,op->op.levels().get("coverage")>0,total),
+    exposure(ops,op->op.levels().get("term")==0,total));
   return new Report(AXES,ops,portfolio);
  }
 
- private static BigDecimal pct(double value){return BigDecimal.valueOf(value*100).setScale(0,RoundingMode.HALF_UP);}
- private Exposure exposure(List<TransparencyScore> rows,java.util.function.Predicate<TransparencyScore> match,BigDecimal total){
-  var picked=rows.stream().filter(match).toList();
-  var amount=picked.stream().map(TransparencyScore::getAmountMillions).reduce(BigDecimal.ZERO,BigDecimal::add);
-  var percent=total.signum()==0?BigDecimal.ZERO:amount.multiply(BigDecimal.valueOf(100)).divide(total,0,RoundingMode.HALF_UP);
-  return new Exposure(picked.size(),amount,percent,picked.stream().map(TransparencyScore::getOperationName).toList());
+ private Cadence describe(AxisCadence cadence,LocalDate today){
+  var regularity=cadence.getRegularity();
+  return new Cadence(cadence.getLatestReference(),cadence.getAgeMonths(today),cadence.isStale(today),cadence.getStaleMonths(),
+    cadence.getPublished12m(),cadence.getExpectedPerYear(),regularity==null?null:pct(regularity),
+    cadence.isIrregular(),cadence.isMeasured(),cadence.getBasis());
  }
 
- public record Axis(String key,String label,String question){}
- public record Dated(LocalDate asOf,Long ageMonths,boolean stale){}
- public record Monitoring(LocalDate asOf,Long ageMonths,boolean stale,Integer published12m,int expected12m,BigDecimal regularity,boolean irregular){}
- public record Operation(String slug,String operationName,String creditCode,BigDecimal amountMillions,Map<String,Integer> levels,int points,BigDecimal percent,String gapNote,Dated coverage,Monitoring monitoring){}
+ private Exposure exposure(List<Operation> ops,java.util.function.Predicate<Operation> match,BigDecimal total){
+  var picked=ops.stream().filter(match).toList();
+  var amount=picked.stream().map(Operation::amountMillions).reduce(BigDecimal.ZERO,BigDecimal::add);
+  var percent=total.signum()==0?BigDecimal.ZERO:amount.multiply(BigDecimal.valueOf(100)).divide(total,0,RoundingMode.HALF_UP);
+  return new Exposure(picked.size(),amount,percent,picked.stream().map(Operation::operationName).toList());
+ }
+
+ private static BigDecimal pct(double value){return BigDecimal.valueOf(value*100).setScale(0,RoundingMode.HALF_UP);}
+
+ public record Axis(String key,String label,String question,boolean recurring){}
+ public record Cadence(LocalDate latestReference,Long ageMonths,boolean stale,int staleMonths,
+   Integer published12m,Integer expectedPerYear,BigDecimal regularity,boolean irregular,boolean measured,String basis){}
+ public record Operation(String slug,String operationName,String creditCode,BigDecimal amountMillions,
+   Map<String,Integer> levels,Map<String,Cadence> cadence,int points,BigDecimal percent,String gapNote){}
+ public record AxisSummary(String label,int measured,int unmeasured,int published12m,int expected12m,BigDecimal regularity){}
  public record Exposure(int operations,BigDecimal amountMillions,BigDecimal percent,List<String> names){}
- public record Cadence(int published12m,int expected12m,BigDecimal regularity,int silent,int irregular,int measured){}
- public record Portfolio(int operations,BigDecimal amountMillions,BigDecimal simpleScore,BigDecimal weightedScore,Cadence cadence,Exposure withoutDebtor,Exposure withCoverage,Exposure withoutTerm,Exposure staleCoverage,Exposure staleMonitoring,Exposure irregularMonitoring){}
+ public record Portfolio(int operations,BigDecimal amountMillions,BigDecimal simpleScore,BigDecimal weightedScore,
+   Map<String,AxisSummary> byAxis,Exposure withoutDebtor,Exposure withCoverage,Exposure withoutTerm){}
  public record Report(List<Axis> axes,List<Operation> operations,Portfolio portfolio){}
 }

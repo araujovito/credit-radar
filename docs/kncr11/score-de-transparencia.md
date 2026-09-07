@@ -29,19 +29,27 @@ cobre a dívida*. Os outros dizem se ela existe e como é descrita.
 não é transparência corrente: vale como evidência parcial, nunca como verificação. O prazo
 acompanha a periodicidade esperada de cada eixo.
 
-| Eixo datado | Cai para parcial quando | Por quê |
-| --- | --- | --- |
-| Cobertura | a apuração tem 18 meses ou mais | LTV e índice de cobertura são apurados em ciclos longos |
-| Acompanhamento | o informe tem 6 meses ou mais, **ou** a cadência fica abaixo de metade do exigido | informe de CRI é obrigação mensal; dois trimestres sem publicar não é acompanhamento, e publicar uma vez por ano tampouco |
-
 **Idade não é frequência.** Quem publicou uma vez em dezembro e quem publicou todos os meses até
-dezembro têm a mesma última evidência e regimes de transparência opostos. Por isso o eixo de
-acompanhamento é medido nas duas dimensões: a data de referência do documento mais recente e
-quantas competências distintas saíram nos últimos doze meses, contra as 12 que o Suplemento E da
-Resolução CVM 60 exige.
+dezembro têm a mesma última evidência e regimes de transparência opostos. Os eixos com cadência
+são medidos nas duas dimensões: a data de referência da evidência mais recente e quantas
+competências distintas saíram nos últimos doze meses, contra o exigido.
 
-A matriz mostra a idade ao lado da célula de cobertura e a cadência ao lado da de acompanhamento
-— `Parcial · 1/12` quer dizer uma competência publicada onde deveriam ser doze.
+| Eixo | Tem cadência? | Esperado | Vence em |
+| --- | --- | --- | --- |
+| Devedora | não | identidade não se repete | — |
+| Termo | não | documento constitutivo, publicado uma vez | — |
+| Garantias | não | descritas no termo | — |
+| Cobertura | sim | o que a cláusula de apuração exigir | 18 meses |
+| Demonstrações | sim | 1 por exercício | 12 meses |
+| Acompanhamento | sim | 12 por ano, pelo Suplemento E da Resolução CVM 60 | 6 meses |
+
+Metade dos eixos não tem cadência, e forçar um esperado neles produziria número com aparência de
+rigor e nenhum conteúdo: um termo de securitização não deveria ser republicado todo mês. Onde a
+periodicidade existe mas não está estabelecida em fonte aberta, a cadência fica **não medida** —
+que não é zero. A matriz marca essas células com borda tracejada.
+
+A cadência aparece na própria célula: `Parcial · 1/12` é uma competência publicada onde deveriam
+ser doze; `Ausente · 0/12` é nenhuma.
 
 ## Resultado
 
@@ -84,8 +92,13 @@ mede o que o mercado divulga, e trabalho próprio não torna a operação mais t
 existe DF publicada, como em Torre Almirante, ela é da emissora ou do patrimônio separado, não de
 quem deve o dinheiro.
 
-**As oito operações publicaram 6 informes em doze meses, contra 96 exigidos.** Regularidade de
-**6%**. Três não publicaram nada, cinco publicaram entre uma e duas competências, nenhuma está em
+**Nenhuma apuração de cobertura foi publicada em doze meses.** Zero de 24 esperadas, medido nas
+duas operações onde a periodicidade exigida é pública: Torre Almirante, cujo relatório apura o
+índice todo mês e parou em fevereiro de 2025, e JW Marriott, cuja cláusula 7.4 exige apuração
+mensal desde agosto de 2025 e cujas competências constam todas como não entregues.
+
+**As oito operações publicaram 6 informes de acompanhamento em doze meses, contra 96 exigidos.**
+Regularidade de **6%**. Três não publicaram nada, cinco publicaram entre uma e duas competências, nenhuma está em
 dia. É o número mais duro do painel, e o mais simples de conferir.
 
 | Operação | Competências em 12 meses | Regularidade | Mais recente |
@@ -126,6 +139,15 @@ mensais com LTV, índice de cobertura e status dos fundos, correndo mês a mês 
 - **A cadência é medida pelo nome do arquivo.** A competência de cada documento é deduzida do
   nome, porque os portais expõem data de upload e não data de referência. Formato novo que não
   case com os padrões conhecidos passa despercebido e subestima a operação.
+- **Demonstrações ficou sem cadência medida nas oito.** Três devedoras são FII e publicam
+  demonstrações no próprio registro na CVM, fora do dossiê da operação. Enquanto isso não for
+  conferido papel a papel, o eixo provavelmente subestima essas três — e medir cadência ali sem
+  a verificação produziria número sem lastro.
+- **Aditamentos não derrubam o eixo do termo, e é proposital.** Torre Almirante tem quatro
+  aditamentos e o CRI Sírio-Libanês tem dois, nenhum com texto consolidado publicado. As
+  condições vigentes exigem ler três a cinco documentos em vez de um, mas todos estão em área
+  aberta: é trabalho a mais, não informação ausente. O que isso revela é uma lacuna do **dossiê**,
+  não da fonte — os aditamentos ainda não foram lidos.
 - **Só o teto do eixo é afetado.** Irregularidade derruba de público para parcial, nunca para
   ausente: quem publica pouco ainda publica algo, e isso vale mais do que silêncio.
 - **Qualidade do que está publicado.** O termo do Eldorado está público mas cortado, sem o Anexo

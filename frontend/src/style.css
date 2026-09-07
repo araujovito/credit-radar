@@ -72,3 +72,4 @@
 .status-card.calculada-aqui{border-left-color:#c7d8ff}.status-card.calculada-aqui b{color:#c7d8ff}
 @media(max-width:700px){.coverage-figures{grid-template-columns:1fr}}
 .fact.warn{border-left-color:#f5c260}.fact.warn b{color:#f5c260}
+.cell.unmeasured{opacity:.62;border-style:dashed}

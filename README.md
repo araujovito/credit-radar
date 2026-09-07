@@ -52,16 +52,17 @@ garantias, cobertura, demonstrações e acompanhamento.
 - **R$ 392,3 mi (40% do recorte)** está em operações onde nem a devedora é identificável.
 - **93% do recorte** não tem LTV nem índice de cobertura publicado.
 - **Nenhuma das oito** tem demonstrações financeiras da devedora.
-- **6 informes publicados em doze meses, contra 96 exigidos** — regularidade de 6%. Três operações
-  não publicaram nada, cinco publicaram uma ou duas competências, nenhuma está em dia.
+- **6 informes de acompanhamento em doze meses, contra 96 exigidos** — regularidade de 6%.
+- **Zero apurações de cobertura em doze meses**, de 24 esperadas nas duas operações onde a
+  periodicidade exigida é pública.
 
 A ponderação piora o número em relação à média simples (40%) porque as duas operações mais
 opacas são a segunda e a terceira maiores do recorte. Quanto maior o cheque, menos se sabe.
 
-**Evidência vence, e idade não é frequência.** Cobertura cai para parcial com 18 meses.
-Acompanhamento cai com 6 meses **ou** com cadência abaixo de metade do exigido — porque quem
-publicou uma vez em dezembro e quem publicou todo mês até dezembro têm a mesma última evidência e
-regimes opostos.
+**Evidência vence, e idade não é frequência.** Os três eixos que se repetem no tempo — cobertura,
+demonstrações e acompanhamento — são medidos por recência e por cadência, e caem para parcial por
+atraso ou por publicar abaixo de metade do exigido. Os outros três descrevem a operação uma vez e
+não têm frequência a medir; forçar um esperado neles daria número sem conteúdo.
 
 Foi assim que apareceu o problema: o `Informe_Mensal` que os agentes fiduciários publicam na área
 aberta é, na prática, **um documento por ano, sempre referente a dezembro**. O nome diz mensal, a
