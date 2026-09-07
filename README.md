@@ -31,6 +31,14 @@ O projeto inclui uma importação manual histórica da Carta do Gestor do KNCR11
 
 A fotografia mais recente é o relatório gerencial de julho de 2026, publicado em agosto no Fundos.NET/B3: 83,6% em ativos-alvo, 12,7% em LCI e 3,7% em caixa. Cada registro mantém a URL e a data do documento de origem.
 
+## API de trabalho
+
+- `POST /api/documents`: importa um documento e, opcionalmente, sua fotografia agregada.
+- `POST /api/positions`: cadastra uma posição de crédito vinculada a um documento.
+- `GET /api/positions?issuer=...`: pesquisa um devedor.
+- `GET /api/analytics/concentration?ticker=KNCR11`: consolida exposição por devedor, setor e indexador.
+- `GET /api/analytics/compare?ticker=KNCR11&from=2024-11-30&to=2026-07-31`: compara posições entre duas datas.
+
 ## Próximos passos para produção
 
 Em `infra/` há a base para executar a API em ECS Fargate e usar RDS PostgreSQL. Antes de aplicar, preencha as variáveis sensíveis por um gerenciador de segredos e revise rede, domínio e custos.
