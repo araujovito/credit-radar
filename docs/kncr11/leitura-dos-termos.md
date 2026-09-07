@@ -161,6 +161,53 @@ patrimonial e de lucros cessantes.
 
 A devedora segue "A confirmar": o termo não está em área aberta e a ficha não a nomeia.
 
+## Relatório de garantias: o caso Torre Almirante
+
+A Vórtx publica, para esta operação, laudo de LTV e relatório mensal de acompanhamento — os
+únicos documentos de cobertura abertos entre as oito. O que eles mostram contradiz o cadastro.
+
+**Verificação de LTV, 15/01/2024**
+
+| | |
+| --- | --- |
+| Saldo devedor total (1ª + 2ª séries) | R$ 303.887.976,21 |
+| Avaliação do imóvel (laudo de 30/11/2023) | R$ 342.447.000,00 |
+| LTV | **88,74%** |
+
+Resultado acima de 75% é evento de vencimento antecipado não automático. A AGT de 18/12/2023
+deliberou waiver para a verificação de 2024.
+
+**Índice de cobertura, agosto de 2024**
+
+| | |
+| --- | --- |
+| NOI de caixa (jun a ago/24) | **-R$ 3.208.155,10** |
+| Somatório das parcelas CRI (ago/24) | R$ 1.520.648,14 |
+| Índice de cobertura | **-2,11** |
+
+Resultado inferior a 1,3 é evento de vencimento antecipado não automático. A mesma AGT dispensou
+a observância entre dezembro de 2023 e julho de 2025, "a partir de quando o índice deverá voltar
+a ser cumprido". Não há apuração pública posterior ao fim do waiver.
+
+E em 12/08/2024 o relatório classifica o fluxo de recursos do mês como **insuficiente**: entraram
+R$ 1.208.192,30 contra R$ 1.520.648,14 devidos. O pagamento saiu porque o FII Prime Portfólio
+aportou R$ 525.849,70 em 16/08/2024. A operação estava pagando com dinheiro do devedor, não com
+caixa do lastro.
+
+Os fundos, esses, estavam enquadrados: reserva de R$ 1.538.577,18 contra mínimo de R$ 1.520.648,14
+e despesas de R$ 79.217,19 contra mínimo de R$ 50.000,00.
+
+### Por que isso mudou o painel
+
+Torre Almirante é a operação com o melhor cadastro da amostra — adimplente, zero obrigações
+vencidas — e a pior cobertura. Um status único nunca mostraria as duas coisas. Por isso cada
+operação passou a ter dois selos independentes: **adimplência de pagamento** e **saúde da
+garantia**, esta última em quatro estados — sem pendência, pendências abertas, sob waiver e sem
+informação.
+
+O último estado é tão informativo quanto os outros: duas operações não têm relatório de garantias
+público nenhum, e nesses casos a ausência de alerta não significa cobertura verificada.
+
 ## O que ainda falta
 
 Duas devedoras continuam sem identificação, por ausência de termo em fonte aberta:
