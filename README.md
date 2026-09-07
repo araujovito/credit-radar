@@ -15,6 +15,8 @@ A pergunta que orienta o produto é a do título do painel: **quem recebe o seu 
   cedente, imóvel, garantias e fonte primária de cada campo.
 - **Score de transparência** por operação e da carteira, medindo o que é verificável em fonte
   aberta.
+- **Coletores versionados** em [`collectors/`](collectors/README.md): o caminho até cada documento,
+  executável, só com a biblioteca padrão do Python.
 - **Separação entre adimplência de pagamento e saúde da garantia** — a leitura central do
   projeto, explicada abaixo.
 
@@ -45,17 +47,34 @@ crédito — foi a desigualdade de informação entre operações que dividem a 
 mede quanto de cada operação é verificável em fonte aberta, em seis eixos: devedora, termo,
 garantias, cobertura, demonstrações e acompanhamento.
 
-**43% na carteira, ponderado pela exposição.** Três números explicam o resto:
+**42% na carteira, ponderado pela exposição.** Três números explicam o resto:
 
 - **R$ 392,3 mi (40% do recorte)** está em operações onde nem a devedora é identificável.
 - **93% do recorte** não tem LTV nem índice de cobertura publicado.
 - **Nenhuma das oito** tem demonstrações financeiras da devedora.
 
-A ponderação piora o número em relação à média simples (46%) porque as duas operações mais
+A ponderação piora o número em relação à média simples (45%) porque as duas operações mais
 opacas são a segunda e a terceira maiores do recorte. Quanto maior o cheque, menos se sabe.
+
+Cobertura vence: uma apuração com 18 meses ou mais cai de público para parcial. É o que impede
+Torre Almirante de marcar 83% apoiado num LTV de janeiro de 2024.
 
 Detalhamento por eixo e limites do modelo em
 [`docs/kncr11/score-de-transparencia.md`](docs/kncr11/score-de-transparencia.md).
+
+## Cobertura calculada onde ninguém publica
+
+No CRI HGBS/Bauru parte da garantia são cotas de dois FIIs listados, com quantidade definida no
+termo e preço observável. Dá para medir o que o agente fiduciário não divulga: em 04/09/2026, a
+parcela mensurável da garantia cobria **66,5%** do saldo das duas séries.
+
+O número vem com a ressalva que importa: 61% dessa garantia está em FLRP11, e as cotas empenhadas
+equivalem a **6,1 vezes todo o giro do papel em doze meses**. É marcação, não valor de saída.
+
+O cálculo **não entra no score de transparência** — o score mede o que o mercado divulga, e
+trabalho próprio não torna a operação mais transparente para quem não o fez. Método e ressalvas em
+[`docs/kncr11/cobertura-calculada.md`](docs/kncr11/cobertura-calculada.md); código em
+[`collectors/coverage_bauru.py`](collectors/coverage_bauru.py).
 
 ## Regras de evidência
 
@@ -91,6 +110,7 @@ React + TypeScript  ->  Spring Boot API  ->  PostgreSQL
 
 - `GET /api/debtors`: dossiês de crédito, com `paymentStatus`, `collateralStatus` e `collateralNote`.
 - `GET /api/analytics/transparency`: eixos, score por operação e agregados da carteira.
+- `GET /api/analytics/coverage`: coberturas calculadas aqui, com data-base, método e ressalvas.
 - `GET /api/research/cri-documents`: documentos localizados por operação e o que cada um provou.
 - `GET /api/analytics/concentration?ticker=KNCR11`: exposição por devedor, setor e indexador.
 - `GET /api/analytics/compare?ticker=KNCR11&from=2024-11-30&to=2026-07-31`: compara duas datas.
@@ -100,12 +120,13 @@ React + TypeScript  ->  Spring Boot API  ->  PostgreSQL
 
 ## Próximos passos
 
-1. Fechar as duas devedoras que seguem "A confirmar" (CPOF — Ed. FL Plaza e HSLG — BTS Meli),
-   ambas da Riza e sem termo em área aberta.
+1. Achar outra via para as duas devedoras que seguem "A confirmar" (CPOF — Ed. FL Plaza e HSLG —
+   BTS Meli). O FNET/CVM está descartado: o filtro por CNPJ é ignorado pelo servidor e a busca por
+   palavra-chave responde HTTP 500, então o repositório oficial não permite a consulta.
 2. Ler os relatórios de garantia das demais operações para medir cobertura, hoje disponível
    apenas para Torre Almirante.
-3. Datar cada nível do score: hoje um documento de 2024 pontua igual a um de 2026, o que
-   superestima operações como Torre Almirante.
+3. Estender a regra de validade ao eixo de acompanhamento, que hoje não distingue quem publica
+   informe todo mês de quem publicou uma vez em 2023.
 4. Só então repetir o processo para outros FIIs.
 
 Em `infra/` há a base para executar a API em ECS Fargate com RDS PostgreSQL. Antes de aplicar,

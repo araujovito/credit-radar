@@ -10,17 +10,18 @@ type Concentration={byIssuer:Record<string,number>};
 type Insights={importedPositions:number;largestEconomicGroup:string;largestEconomicGroupAmountMillions:number;largestEconomicGroupPercent:number;largestSector:string};
 type GroupProfile={id:number;name:string;sector:string;publicStatus:string;ticker:string;sourceUrl:string;relationshipNote:string;confidence:string};
 type TAxis={key:string;label:string;question:string};
-type TOperation={slug:string;operationName:string;creditCode:string;amountMillions:number;levels:Record<string,number>;points:number;percent:number;gapNote:string};
+type TOperation={slug:string;operationName:string;creditCode:string;amountMillions:number;levels:Record<string,number>;points:number;percent:number;gapNote:string;coverageAsOf:string|null;coverageAgeMonths:number|null;coverageStale:boolean};
 type TExposure={operations:number;amountMillions:number;percent:number;names:string[]};
-type TReport={axes:TAxis[];operations:TOperation[];portfolio:{operations:number;amountMillions:number;simpleScore:number;weightedScore:number;withoutDebtor:TExposure;withCoverage:TExposure;withoutTerm:TExposure}|null};
+type TReport={axes:TAxis[];operations:TOperation[];portfolio:{operations:number;amountMillions:number;simpleScore:number;weightedScore:number;withoutDebtor:TExposure;withCoverage:TExposure;withoutTerm:TExposure;staleCoverage:TExposure}|null};
+type Coverage={slug:string;asOfDate:string;scope:string;collateralValue:number;securedBalance:number;coveragePercent:number;method:string;caveat:string;sourceNote:string};
 type DebtorResearch={id:number;debtor:string;status:string;sourceUrl:string};
 type CriDocument={id:number;creditCode:string;operationName:string;issuer:string;sourceType:string;availability:string;finding:string;sourceUrl:string};
 type Dossier={id:number;slug:string;operationName:string;legalName:string;cnpj:string;economicGroup:string;sector:string;entityType:string;debtAndLiquidity:string;cashGeneration:string;guarantees:string;alertHistory:string;sourceNote:string;sourceUrl:string;paymentStatus:string;collateralStatus:string;collateralNote:string};
 
 function App(){
- const [assets,setAssets]=useState<Asset[]>([]); const [summary,setSummary]=useState<Summary>(); const [snapshot,setSnapshot]=useState<Snapshot>(); const [positions,setPositions]=useState<Position[]>([]); const [concentration,setConcentration]=useState<Concentration>(); const [insights,setInsights]=useState<Insights>(); const [profiles,setProfiles]=useState<GroupProfile[]>([]); const [research,setResearch]=useState<DebtorResearch[]>([]); const [criDocuments,setCriDocuments]=useState<CriDocument[]>([]); const [dossiers,setDossiers]=useState<Dossier[]>([]); const [transparency,setTransparency]=useState<TReport>();
- useEffect(()=>{Promise.all([fetch('/api/assets').then(r=>r.json()),fetch('/api/dashboard').then(r=>r.json()),fetch('/api/snapshots').then(r=>r.json()),fetch('/api/positions').then(r=>r.json()),fetch('/api/analytics/concentration?ticker=KNCR11').then(r=>r.json()),fetch('/api/analytics/insights?ticker=KNCR11').then(r=>r.json()),fetch('/api/research/groups').then(r=>r.json()),fetch('/api/research/debtors').then(r=>r.json()),fetch('/api/research/cri-documents').then(r=>r.json()),fetch('/api/debtors').then(r=>r.json()),fetch('/api/analytics/transparency').then(r=>r.json())]).then(([a,s,p,po,c,i,g,r,d,ds,t])=>{setAssets(a);setSummary(s);setSnapshot(p[0]);setPositions(po);setConcentration(c);setInsights(i);setProfiles(g);setResearch(r);setCriDocuments(d);setDossiers(ds);setTransparency(t)})},[]);
- const selected=dossiers.find(d=>d.slug===new URLSearchParams(window.location.search).get('devedor')); if(selected)return <DossierPage dossier={selected}/>;
+ const [assets,setAssets]=useState<Asset[]>([]); const [summary,setSummary]=useState<Summary>(); const [snapshot,setSnapshot]=useState<Snapshot>(); const [positions,setPositions]=useState<Position[]>([]); const [concentration,setConcentration]=useState<Concentration>(); const [insights,setInsights]=useState<Insights>(); const [profiles,setProfiles]=useState<GroupProfile[]>([]); const [research,setResearch]=useState<DebtorResearch[]>([]); const [criDocuments,setCriDocuments]=useState<CriDocument[]>([]); const [dossiers,setDossiers]=useState<Dossier[]>([]); const [transparency,setTransparency]=useState<TReport>(); const [coverages,setCoverages]=useState<Coverage[]>([]);
+ useEffect(()=>{Promise.all([fetch('/api/assets').then(r=>r.json()),fetch('/api/dashboard').then(r=>r.json()),fetch('/api/snapshots').then(r=>r.json()),fetch('/api/positions').then(r=>r.json()),fetch('/api/analytics/concentration?ticker=KNCR11').then(r=>r.json()),fetch('/api/analytics/insights?ticker=KNCR11').then(r=>r.json()),fetch('/api/research/groups').then(r=>r.json()),fetch('/api/research/debtors').then(r=>r.json()),fetch('/api/research/cri-documents').then(r=>r.json()),fetch('/api/debtors').then(r=>r.json()),fetch('/api/analytics/transparency').then(r=>r.json()),fetch('/api/analytics/coverage').then(r=>r.json())]).then(([a,s,p,po,c,i,g,r,d,ds,t,cv])=>{setAssets(a);setSummary(s);setSnapshot(p[0]);setPositions(po);setConcentration(c);setInsights(i);setProfiles(g);setResearch(r);setCriDocuments(d);setDossiers(ds);setTransparency(t);setCoverages(cv)})},[]);
+ const selected=dossiers.find(d=>d.slug===new URLSearchParams(window.location.search).get('devedor')); if(selected)return <DossierPage dossier={selected} coverage={coverages.find(c=>c.slug===selected.slug)}/>;
  return <main><header><div><span>CREDIT RADAR</span><h1>Quem recebe o seu crédito?</h1><p>Monitoramento de crédito privado listado no Brasil.</p></div><div className="sync">● Dados até jul/2026<br/><small>primeiro ativo em análise</small></div></header>
  <section className="metrics"><Metric value={summary?.assets??0} label="ativo acompanhado"/><Metric value={insights?.importedPositions??0} label="posições atuais"/><Metric value={research.length} label="devedores investigados"/></section>
  {snapshot&&<section className="notice"><b>KNCR11 · posição de julho de 2026</b><p>{snapshot.targetAssetsPercent}% em ativos-alvo · {snapshot.lciPercent}% em LCI · {snapshot.cashPercent}% em caixa · <a href={snapshot.sourceDocument.sourceUrl} target="_blank">documento na B3 ↗</a></p></section>}
@@ -33,6 +34,23 @@ function App(){
  <section><div className="title"><div><span className="eyebrow">PESQUISA PÚBLICA</span><h2>Grupos econômicos prioritários</h2></div></div><div className="assets">{profiles.map(g=><article key={g.id}><div className="badge">{g.confidence}</div><div><b>{g.name} {g.ticker&&`· ${g.ticker}`}</b><small>{g.sector} · {g.publicStatus}</small></div><span className="type">{g.relationshipNote}</span><a className="manager" href={g.sourceUrl} target="_blank">Fonte pública ↗</a><i>→</i></article>)}</div></section></main>
 }
 
+
+function money(v:number){return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function CoverageBlock({c}:{c:Coverage}){
+ return <section className="coverage-block">
+  <h2>Cobertura calculada pelo Credit Radar</h2>
+  <p className="coverage-scope">{c.scope} · data-base {new Date(c.asOfDate+'T12:00:00').toLocaleDateString('pt-BR')}</p>
+  <div className="coverage-figures">
+   <div><span>Garantia mensurável</span><b>{money(c.collateralValue)}</b></div>
+   <div><span>Saldo devedor coberto</span><b>{money(c.securedBalance)}</b></div>
+   <div className="pct"><span>Cobertura parcial</span><b>{c.coveragePercent}%</b></div>
+  </div>
+  <h3>Como foi calculado</h3><p>{c.method}</p>
+  <h3>Por que o número não é um valor de saída</h3><p className="caveat">{c.caveat}</p>
+  <p className="coverage-source">{c.sourceNote}</p>
+  <p className="coverage-source">Este cálculo não conta para o score de transparência: o score mede o que o mercado divulga, e cálculo próprio não torna a operação mais transparente.</p>
+ </section>;
+}
 const LEVELS=['ausente','parcial','publico'];
 const LEVEL_LABEL=['Ausente','Parcial','Público'];
 function TransparencySection({report}:{report:TReport}){
@@ -43,14 +61,14 @@ function TransparencySection({report}:{report:TReport}){
   <div className="score-big"><strong>{p.weightedScore}%</strong><span>ponderado pela exposição</span><small>{p.simpleScore}% na média simples · {p.operations} operações · R$ {p.amountMillions.toLocaleString('pt-BR')} mi</small></div>
   <div className="score-facts">
    <div className="fact bad"><b>R$ {p.withoutDebtor.amountMillions.toLocaleString('pt-BR')} mi · {p.withoutDebtor.percent}%</b><span>em operações onde nem a devedora é identificável em fonte aberta</span><small>{p.withoutDebtor.names.join(' · ')}</small></div>
-   <div className="fact bad"><b>{100-p.withCoverage.percent}% do recorte</b><span>sem LTV ou índice de cobertura publicado</span><small>Só {p.withCoverage.names.join(' · ')} permite aferir a garantia</small></div>
+   <div className="fact bad"><b>{100-p.withCoverage.percent}% do recorte</b><span>sem LTV ou índice de cobertura publicado</span><small>Só {p.withCoverage.names.join(' · ')} tem apuração — e ela está defasada: {p.staleCoverage.names.join(' · ')} caiu para parcial por ter mais de 18 meses</small></div>
   </div>
  </div>
  <div className="matrix" role="table">
   <div className="matrix-row head" role="row"><span>Operação</span>{report.axes.map(a=><em key={a.key} title={a.question}>{a.label}</em>)}<span className="score-col">Score</span></div>
   {report.operations.map(o=><div className="matrix-row" role="row" key={o.slug}>
    <span className="op"><b>{o.operationName}</b><small>{o.creditCode} · R$ {o.amountMillions.toLocaleString('pt-BR')} mi</small></span>
-   {report.axes.map(a=><em key={a.key} className={`cell ${LEVELS[o.levels[a.key]]}`} title={`${a.label}: ${LEVEL_LABEL[o.levels[a.key]]} — ${a.question}`}>{LEVEL_LABEL[o.levels[a.key]]}</em>)}
+   {report.axes.map(a=><em key={a.key} className={`cell ${LEVELS[o.levels[a.key]]}`} title={`${a.label}: ${LEVEL_LABEL[o.levels[a.key]]} — ${a.question}`}>{LEVEL_LABEL[o.levels[a.key]]}{a.key==='coverage'&&o.coverageStale?<i className="stale" title={`Apuração de ${new Date(o.coverageAsOf+'T12:00:00').toLocaleDateString('pt-BR')}, ${o.coverageAgeMonths} meses atrás`}> · {o.coverageAgeMonths}m</i>:null}</em>)}
    <span className={`score-col ${o.percent>=67?'ok':o.percent>=40?'warn':'bad'}`}>{o.percent}%</span>
   </div>)}
  </div>
@@ -59,6 +77,6 @@ function TransparencySection({report}:{report:TReport}){
 }
 function slugify(v:string){return (v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z]+/g,'-')}
 function Metric({value,label}:{value:number;label:string}){return <div className="metric"><strong>{value}</strong><span>{label}</span></div>}
-function DossierPage({dossier:d}:{dossier:Dossier}){return <main><header><div><span>DOSSIÊ DE CRÉDITO · KNCR11</span><h1>{d.operationName}</h1><p>Informações confirmadas em fontes públicas e pendências documentais.</p></div><a className="back" href="/">← Voltar ao painel</a></header><section className="dossier-grid"><Info label="Nome jurídico" value={d.legalName}/><Info label="CNPJ" value={d.cnpj}/><Info label="Grupo econômico" value={d.economicGroup}/><Info label="Setor e segmento" value={d.sector}/><Info label="Estrutura" value={d.entityType}/></section><DossierBlock title="Dívida e liquidez" value={d.debtAndLiquidity}/><DossierBlock title="Geração de caixa e demonstrações" value={d.cashGeneration}/><DossierBlock title="Garantias do CRI" value={d.guarantees}/><section className="status-split"><div className={`status-card pay ${slugify(d.paymentStatus)}`}><span>Adimplência de pagamento</span><b>{d.paymentStatus}</b><p>Refere-se apenas ao pagamento de juros e amortização no vencimento.</p></div><div className={`status-card col ${slugify(d.collateralStatus)}`}><span>Saúde da garantia</span><b>{d.collateralStatus}</b><p>{d.collateralNote}</p></div></section><DossierBlock title="Histórico de alertas e eventos relevantes" value={d.alertHistory}/><section className="notice"><b>Fontes primárias</b><p>{d.sourceNote} <a href={d.sourceUrl} target="_blank">Abrir fonte ↗</a></p></section></main>}
+function DossierPage({dossier:d,coverage}:{dossier:Dossier;coverage?:Coverage}){return <main><header><div><span>DOSSIÊ DE CRÉDITO · KNCR11</span><h1>{d.operationName}</h1><p>Informações confirmadas em fontes públicas e pendências documentais.</p></div><a className="back" href="/">← Voltar ao painel</a></header><section className="dossier-grid"><Info label="Nome jurídico" value={d.legalName}/><Info label="CNPJ" value={d.cnpj}/><Info label="Grupo econômico" value={d.economicGroup}/><Info label="Setor e segmento" value={d.sector}/><Info label="Estrutura" value={d.entityType}/></section><DossierBlock title="Dívida e liquidez" value={d.debtAndLiquidity}/><DossierBlock title="Geração de caixa e demonstrações" value={d.cashGeneration}/><DossierBlock title="Garantias do CRI" value={d.guarantees}/><section className="status-split"><div className={`status-card pay ${slugify(d.paymentStatus)}`}><span>Adimplência de pagamento</span><b>{d.paymentStatus}</b><p>Refere-se apenas ao pagamento de juros e amortização no vencimento.</p></div><div className={`status-card col ${slugify(d.collateralStatus)}`}><span>Saúde da garantia</span><b>{d.collateralStatus}</b><p>{d.collateralNote}</p></div></section>{coverage&&<CoverageBlock c={coverage}/>}<DossierBlock title="Histórico de alertas e eventos relevantes" value={d.alertHistory}/><section className="notice"><b>Fontes primárias</b><p>{d.sourceNote} <a href={d.sourceUrl} target="_blank">Abrir fonte ↗</a></p></section></main>}
 function Info({label,value}:{label:string;value:string}){return <div className="info"><span>{label}</span><b>{value}</b></div>}; function DossierBlock({title,value}:{title:string;value:string}){return <section className="dossier-block"><h2>{title}</h2><p>{value}</p></section>}
 createRoot(document.getElementById('root')!).render(<App/>);
