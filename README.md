@@ -47,17 +47,22 @@ crédito — foi a desigualdade de informação entre operações que dividem a 
 mede quanto de cada operação é verificável em fonte aberta, em seis eixos: devedora, termo,
 garantias, cobertura, demonstrações e acompanhamento.
 
-**42% na carteira, ponderado pela exposição.** Três números explicam o resto:
+**38% na carteira, ponderado pela exposição.** Quatro números explicam o resto:
 
 - **R$ 392,3 mi (40% do recorte)** está em operações onde nem a devedora é identificável.
 - **93% do recorte** não tem LTV nem índice de cobertura publicado.
 - **Nenhuma das oito** tem demonstrações financeiras da devedora.
+- **Nenhuma das oito** tem acompanhamento corrente: três não publicam nada e as outras cinco estão
+  com o informe mais recente entre 6 e 8 meses atrás.
 
-A ponderação piora o número em relação à média simples (45%) porque as duas operações mais
+A ponderação piora o número em relação à média simples (40%) porque as duas operações mais
 opacas são a segunda e a terceira maiores do recorte. Quanto maior o cheque, menos se sabe.
 
-Cobertura vence: uma apuração com 18 meses ou mais cai de público para parcial. É o que impede
-Torre Almirante de marcar 83% apoiado num LTV de janeiro de 2024.
+**Evidência vence.** Cobertura cai para parcial com 18 meses; acompanhamento, com 6. Foi ao datar
+o segundo eixo que apareceu o problema: o `Informe_Mensal` que os agentes fiduciários publicam na
+área aberta é, na prática, **um documento por ano, sempre referente a dezembro**. O nome diz
+mensal, a regra é mensal, a publicação é anual — e entre março e dezembro quem consulta está
+olhando dados de até doze meses atrás.
 
 Detalhamento por eixo e limites do modelo em
 [`docs/kncr11/score-de-transparencia.md`](docs/kncr11/score-de-transparencia.md).
@@ -125,8 +130,8 @@ React + TypeScript  ->  Spring Boot API  ->  PostgreSQL
    palavra-chave responde HTTP 500, então o repositório oficial não permite a consulta.
 2. Ler os relatórios de garantia das demais operações para medir cobertura, hoje disponível
    apenas para Torre Almirante.
-3. Estender a regra de validade ao eixo de acompanhamento, que hoje não distingue quem publica
-   informe todo mês de quem publicou uma vez em 2023.
+3. Medir frequência, não só idade: quem publicou uma vez em 12/2025 e quem publicou todo mês até
+   12/2025 pontuam igual hoje, embora só o segundo esteja em regime de acompanhamento.
 4. Só então repetir o processo para outros FIIs.
 
 Em `infra/` há a base para executar a API em ECS Fargate com RDS PostgreSQL. Antes de aplicar,

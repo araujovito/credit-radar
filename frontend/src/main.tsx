@@ -10,9 +10,10 @@ type Concentration={byIssuer:Record<string,number>};
 type Insights={importedPositions:number;largestEconomicGroup:string;largestEconomicGroupAmountMillions:number;largestEconomicGroupPercent:number;largestSector:string};
 type GroupProfile={id:number;name:string;sector:string;publicStatus:string;ticker:string;sourceUrl:string;relationshipNote:string;confidence:string};
 type TAxis={key:string;label:string;question:string};
-type TOperation={slug:string;operationName:string;creditCode:string;amountMillions:number;levels:Record<string,number>;points:number;percent:number;gapNote:string;coverageAsOf:string|null;coverageAgeMonths:number|null;coverageStale:boolean};
+type TOperation={slug:string;operationName:string;creditCode:string;amountMillions:number;levels:Record<string,number>;points:number;percent:number;gapNote:string;coverage:TDated;monitoring:TDated};
+type TDated={asOf:string|null;ageMonths:number|null;stale:boolean};
 type TExposure={operations:number;amountMillions:number;percent:number;names:string[]};
-type TReport={axes:TAxis[];operations:TOperation[];portfolio:{operations:number;amountMillions:number;simpleScore:number;weightedScore:number;withoutDebtor:TExposure;withCoverage:TExposure;withoutTerm:TExposure;staleCoverage:TExposure}|null};
+type TReport={axes:TAxis[];operations:TOperation[];portfolio:{operations:number;amountMillions:number;simpleScore:number;weightedScore:number;withoutDebtor:TExposure;withCoverage:TExposure;withoutTerm:TExposure;staleCoverage:TExposure;staleMonitoring:TExposure}|null};
 type Coverage={slug:string;asOfDate:string;scope:string;collateralValue:number;securedBalance:number;coveragePercent:number;method:string;caveat:string;sourceNote:string};
 type DebtorResearch={id:number;debtor:string;status:string;sourceUrl:string};
 type CriDocument={id:number;creditCode:string;operationName:string;issuer:string;sourceType:string;availability:string;finding:string;sourceUrl:string};
@@ -53,6 +54,16 @@ function CoverageBlock({c}:{c:Coverage}){
 }
 const LEVELS=['ausente','parcial','publico'];
 const LEVEL_LABEL=['Ausente','Parcial','Público'];
+
+function dated(o:TOperation,key:string):TDated|null{return key==='coverage'?o.coverage:key==='monitoring'?o.monitoring:null}
+function Cell({axis,operation}:{axis:TAxis;operation:TOperation}){
+ const level=operation.levels[axis.key]; const d=dated(operation,axis.key);
+ const aged=d&&d.stale&&d.asOf;
+ const when=d&&d.asOf?new Date(d.asOf+'T12:00:00').toLocaleDateString('pt-BR'):null;
+ return <em className={`cell ${LEVELS[level]}`} title={`${axis.label}: ${LEVEL_LABEL[level]}${when?` — última evidência em ${when}`:''} — ${axis.question}`}>
+  {LEVEL_LABEL[level]}{aged?<i className="stale"> · {d!.ageMonths}m</i>:null}
+ </em>;
+}
 function TransparencySection({report}:{report:TReport}){
  const p=report.portfolio!;
  return <section className="transparency"><div className="title"><div><span className="eyebrow">SCORE DE TRANSPARÊNCIA · KNCR11</span><h2>O que dá para saber, e o que não dá</h2></div></div>
@@ -61,14 +72,15 @@ function TransparencySection({report}:{report:TReport}){
   <div className="score-big"><strong>{p.weightedScore}%</strong><span>ponderado pela exposição</span><small>{p.simpleScore}% na média simples · {p.operations} operações · R$ {p.amountMillions.toLocaleString('pt-BR')} mi</small></div>
   <div className="score-facts">
    <div className="fact bad"><b>R$ {p.withoutDebtor.amountMillions.toLocaleString('pt-BR')} mi · {p.withoutDebtor.percent}%</b><span>em operações onde nem a devedora é identificável em fonte aberta</span><small>{p.withoutDebtor.names.join(' · ')}</small></div>
-   <div className="fact bad"><b>{100-p.withCoverage.percent}% do recorte</b><span>sem LTV ou índice de cobertura publicado</span><small>Só {p.withCoverage.names.join(' · ')} tem apuração — e ela está defasada: {p.staleCoverage.names.join(' · ')} caiu para parcial por ter mais de 18 meses</small></div>
+   <div className="fact warn"><b>{p.staleMonitoring.operations} de {p.operations} operações</b><span>sem acompanhamento corrente: o informe mais recente na área aberta tem mais de 6 meses</span><small>{p.staleMonitoring.names.join(' · ')}</small></div>
+   <div className="fact bad"><b>{100-p.withCoverage.percent}% do recorte</b><span>sem LTV ou índice de cobertura publicado</span><small>Só {p.withCoverage.names.join(' · ')} tem apuração, e ela venceu: caiu para parcial por ter mais de 18 meses</small></div>
   </div>
  </div>
  <div className="matrix" role="table">
   <div className="matrix-row head" role="row"><span>Operação</span>{report.axes.map(a=><em key={a.key} title={a.question}>{a.label}</em>)}<span className="score-col">Score</span></div>
   {report.operations.map(o=><div className="matrix-row" role="row" key={o.slug}>
    <span className="op"><b>{o.operationName}</b><small>{o.creditCode} · R$ {o.amountMillions.toLocaleString('pt-BR')} mi</small></span>
-   {report.axes.map(a=><em key={a.key} className={`cell ${LEVELS[o.levels[a.key]]}`} title={`${a.label}: ${LEVEL_LABEL[o.levels[a.key]]} — ${a.question}`}>{LEVEL_LABEL[o.levels[a.key]]}{a.key==='coverage'&&o.coverageStale?<i className="stale" title={`Apuração de ${new Date(o.coverageAsOf+'T12:00:00').toLocaleDateString('pt-BR')}, ${o.coverageAgeMonths} meses atrás`}> · {o.coverageAgeMonths}m</i>:null}</em>)}
+   {report.axes.map(a=><Cell key={a.key} axis={a} operation={o}/>)}
    <span className={`score-col ${o.percent>=67?'ok':o.percent>=40?'warn':'bad'}`}>{o.percent}%</span>
   </div>)}
  </div>

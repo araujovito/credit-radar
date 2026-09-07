@@ -20,36 +20,41 @@ Máximo de 12 pontos por operação.
 | Garantias | As garantias estão descritas em documento primário, e não só listadas em cadastro? |
 | Cobertura | Há LTV ou índice de cobertura publicado, e recente, para aferir a garantia? |
 | Demonstrações | Há demonstrações financeiras da devedora? |
-| Acompanhamento | Há relatório ou informe periódico público da operação? |
+| Acompanhamento | Há relatório ou informe periódico público, e recente, da operação? |
 
 O eixo de cobertura é o que mais pesa na prática, porque é o único que responde *se a garantia
 cobre a dívida*. Os outros dizem se ela existe e como é descrita.
 
-**Cobertura vence.** Uma apuração com 18 meses ou mais cai de público para parcial. Sem essa
-regra, Torre Almirante marcaria 83% apoiado num LTV de janeiro de 2024 e num índice de cobertura
-de agosto de 2024 — números que descreviam a operação, não a descrevem mais, e cujo waiver
-expirou em julho de 2025 sem nova verificação divulgada. Com a regra, cai para 75%, e a matriz
-mostra a idade da apuração ao lado da célula.
+**Dois eixos têm prazo de validade.** Documento que descrevia a operação e não a descreve mais
+não é transparência corrente: vale como evidência parcial, nunca como verificação. O prazo
+acompanha a periodicidade esperada de cada eixo.
+
+| Eixo datado | Cai para parcial a partir de | Por quê |
+| --- | --- | --- |
+| Cobertura | 18 meses | LTV e índice de cobertura são apurados em ciclos longos |
+| Acompanhamento | 6 meses | informe é obrigação mensal; dois trimestres sem publicar não é acompanhamento |
+
+A matriz mostra a idade da evidência ao lado da célula que envelheceu.
 
 ## Resultado
 
 | Operação | Dev. | Termo | Gar. | Cob. | DF | Acomp. | Score |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | --: |
-| BRCR — Torre Almirante | ● | ● | ● | ◐ | ○ | ● | **75%** |
-| Edifício O Parque | ● | ● | ● | ○ | ○ | ● | **67%** |
-| HGBS — Bauru Shopping | ● | ● | ● | ○ | ○ | ● | **67%** |
-| Ed. Eldorado | ◐ | ● | ● | ○ | ○ | ● | **58%** |
+| BRCR — Torre Almirante | ● | ● | ● | ◐ | ○ | ◐ | **67%** |
+| Edifício O Parque | ● | ● | ● | ○ | ○ | ◐ | **58%** |
+| HGBS — Bauru Shopping | ● | ● | ● | ○ | ○ | ◐ | **58%** |
 | TRX — O Parque | ● | ● | ● | ○ | ○ | ○ | **50%** |
-| JW Marriott Hotel | ○ | ○ | ◐ | ○ | ○ | ● | **25%** |
+| Ed. Eldorado | ◐ | ● | ● | ○ | ○ | ◐ | **50%** |
+| JW Marriott Hotel | ○ | ○ | ◐ | ○ | ○ | ◐ | **17%** |
 | CPOF — Ed. FL Plaza | ○ | ○ | ◐ | ○ | ○ | ○ | **8%** |
 | HSLG — BTS Meli | ○ | ○ | ◐ | ○ | ○ | ○ | **8%** |
 
 ● público · ◐ parcial · ○ ausente
 
-A cobertura de Torre Almirante aparece como parcial por defasagem: a apuração existe e é boa, mas
-tem 24 meses.
+Nenhuma célula de acompanhamento é verde. Todas as cinco operações que têm informe público estão
+fora do prazo — voltamos a isso abaixo.
 
-**Score da carteira: 42% ponderado pela exposição**, contra 45% na média simples. A ponderação
+**Score da carteira: 38% ponderado pela exposição**, contra 40% na média simples. A ponderação
 piora o número porque as duas operações mais opacas — FL Plaza e JW Marriott — são a segunda e a
 terceira maiores do recorte. Quanto maior o cheque, menos se sabe.
 
@@ -61,7 +66,7 @@ está em área aberta e nenhum documento público a nomeia. O investidor de KNCR
 saber para quem emprestou dois quintos deste recorte.
 
 **93% do recorte não tem LTV nem índice de cobertura publicado.** Só Torre Almirante permite
-aferir se a garantia cobre a dívida, e essa apuração é de agosto de 2024.
+aferir se a garantia cobre a dívida, e essa apuração é de fevereiro de 2025.
 
 Em uma delas, porém, deu para medir por fora: no CRI HGBS/Bauru parte da garantia são cotas de
 FIIs listados, com quantidade definida no termo e preço observável. O resultado está em
@@ -72,11 +77,37 @@ mede o que o mercado divulga, e trabalho próprio não torna a operação mais t
 existe DF publicada, como em Torre Almirante, ela é da emissora ou do patrimônio separado, não de
 quem deve o dinheiro.
 
+**Nenhuma das oito tem acompanhamento corrente.** Três não publicam nada; as outras cinco
+publicam com atraso — o informe mais recente na área aberta tem entre 6 e 8 meses. Isso equivale
+a 58% do recorte com informação periódica vencida, além dos 40% sem informação nenhuma.
+
+## O "informe mensal" que é anual
+
+Foi o que apareceu ao datar o eixo. Opea e VERT publicam, na área aberta do agente fiduciário, um
+`Informe_Mensal` por ano, sempre referente a dezembro:
+
+| Operação | Informes na área aberta |
+| --- | --- |
+| Edifício O Parque | 12/2023, 12/2024, 12/2025 |
+| Ed. Eldorado | 12/2024, 12/2025 |
+| JW Marriott | 12/2025 — um só |
+| BRCR — Torre Almirante | 12/2024, 12/2025, além dos mensais que pararam em 02/2025 |
+| HGBS — Bauru Shopping | 01/2026 e 02/2026, ambos da 1ª série; nenhum da 2ª |
+
+O nome do documento diz mensal, a periodicidade regulatória é mensal, e a publicação é anual.
+Entre março e dezembro, quem consulta está olhando dados de até doze meses atrás.
+
+Torre Almirante é o caso mais nítido porque ali existiu acompanhamento de verdade: relatórios
+mensais com LTV, índice de cobertura e status dos fundos, correndo mês a mês até fevereiro de
+2025. Depois disso, silêncio — e é justamente quando o waiver do índice expirava.
+
 ## O que o score não captura
 
-- **Atualidade fora do eixo de cobertura.** A regra dos 18 meses vale só para cobertura. Um termo
-  de securitização não envelhece do mesmo jeito, mas um informe mensal sim, e hoje o eixo de
-  acompanhamento não distingue quem publica todo mês de quem publicou uma vez em 2023.
+- **Frequência, não só idade.** Os prazos olham a evidência mais recente. Quem publicou uma vez em
+  12/2025 e quem publicou todo mês até 12/2025 pontuam igual, embora o segundo esteja num regime
+  de acompanhamento e o primeiro não.
+- **Envelhecimento em degrau.** Um informe de 5 meses vale 2 e um de 6 vale 1. O corte é abrupto
+  onde a realidade é contínua.
 - **Qualidade do que está publicado.** O termo do Eldorado está público mas cortado, sem o Anexo
   IX. Ele pontua 2 no eixo Termo e 1 no eixo Devedora, o que só parcialmente reflete o problema.
 - **Assimetria entre investidor profissional e cotista.** Boa parte destes documentos existe em
