@@ -39,6 +39,8 @@ A fotografia mais recente é o relatório gerencial de julho de 2026, publicado 
 - `GET /api/analytics/concentration?ticker=KNCR11`: consolida exposição por devedor, setor e indexador.
 - `GET /api/analytics/compare?ticker=KNCR11&from=2024-11-30&to=2026-07-31`: compara posições entre duas datas.
 
+A comparação só é marcada como pronta quando há posições detalhadas nas duas datas; uma fotografia agregada não é interpretada como saída de CRIs.
+
 ## Próximos passos para produção
 
 Em `infra/` há a base para executar a API em ECS Fargate e usar RDS PostgreSQL. Antes de aplicar, preencha as variáveis sensíveis por um gerenciador de segredos e revise rede, domínio e custos.
