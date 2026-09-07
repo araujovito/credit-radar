@@ -14,5 +14,6 @@ public class CriDocument {
  @Column(nullable=false,length=1200) private String sourceUrl;
  protected CriDocument(){}
  public CriDocument(String creditCode,String operationName,String issuer,String sourceType,String availability,String finding,String sourceUrl){this.creditCode=creditCode;this.operationName=operationName;this.issuer=issuer;this.sourceType=sourceType;this.availability=availability;this.finding=finding;this.sourceUrl=sourceUrl;}
+ public void refresh(String issuer,String sourceType,String availability,String finding,String sourceUrl){this.issuer=issuer;this.sourceType=sourceType;this.availability=availability;this.finding=finding;this.sourceUrl=sourceUrl;}
  public Long getId(){return id;} public String getCreditCode(){return creditCode;} public String getOperationName(){return operationName;} public String getIssuer(){return issuer;} public String getSourceType(){return sourceType;} public String getAvailability(){return availability;} public String getFinding(){return finding;} public String getSourceUrl(){return sourceUrl;}
 }
