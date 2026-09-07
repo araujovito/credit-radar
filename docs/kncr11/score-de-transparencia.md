@@ -20,7 +20,7 @@ Máximo de 12 pontos por operação.
 | Garantias | As garantias estão descritas em documento primário, e não só listadas em cadastro? |
 | Cobertura | Há LTV ou índice de cobertura publicado, e recente, para aferir a garantia? |
 | Demonstrações | Há demonstrações financeiras da devedora? |
-| Acompanhamento | Há relatório ou informe periódico público, e recente, da operação? |
+| Acompanhamento | Há acompanhamento periódico público, recente e regular? |
 
 O eixo de cobertura é o que mais pesa na prática, porque é o único que responde *se a garantia
 cobre a dívida*. Os outros dizem se ela existe e como é descrita.
@@ -29,12 +29,19 @@ cobre a dívida*. Os outros dizem se ela existe e como é descrita.
 não é transparência corrente: vale como evidência parcial, nunca como verificação. O prazo
 acompanha a periodicidade esperada de cada eixo.
 
-| Eixo datado | Cai para parcial a partir de | Por quê |
+| Eixo datado | Cai para parcial quando | Por quê |
 | --- | --- | --- |
-| Cobertura | 18 meses | LTV e índice de cobertura são apurados em ciclos longos |
-| Acompanhamento | 6 meses | informe é obrigação mensal; dois trimestres sem publicar não é acompanhamento |
+| Cobertura | a apuração tem 18 meses ou mais | LTV e índice de cobertura são apurados em ciclos longos |
+| Acompanhamento | o informe tem 6 meses ou mais, **ou** a cadência fica abaixo de metade do exigido | informe de CRI é obrigação mensal; dois trimestres sem publicar não é acompanhamento, e publicar uma vez por ano tampouco |
 
-A matriz mostra a idade da evidência ao lado da célula que envelheceu.
+**Idade não é frequência.** Quem publicou uma vez em dezembro e quem publicou todos os meses até
+dezembro têm a mesma última evidência e regimes de transparência opostos. Por isso o eixo de
+acompanhamento é medido nas duas dimensões: a data de referência do documento mais recente e
+quantas competências distintas saíram nos últimos doze meses, contra as 12 que o Suplemento E da
+Resolução CVM 60 exige.
+
+A matriz mostra a idade ao lado da célula de cobertura e a cadência ao lado da de acompanhamento
+— `Parcial · 1/12` quer dizer uma competência publicada onde deveriam ser doze.
 
 ## Resultado
 
@@ -77,13 +84,24 @@ mede o que o mercado divulga, e trabalho próprio não torna a operação mais t
 existe DF publicada, como em Torre Almirante, ela é da emissora ou do patrimônio separado, não de
 quem deve o dinheiro.
 
-**Nenhuma das oito tem acompanhamento corrente.** Três não publicam nada; as outras cinco
-publicam com atraso — o informe mais recente na área aberta tem entre 6 e 8 meses. Isso equivale
-a 58% do recorte com informação periódica vencida, além dos 40% sem informação nenhuma.
+**As oito operações publicaram 6 informes em doze meses, contra 96 exigidos.** Regularidade de
+**6%**. Três não publicaram nada, cinco publicaram entre uma e duas competências, nenhuma está em
+dia. É o número mais duro do painel, e o mais simples de conferir.
+
+| Operação | Competências em 12 meses | Regularidade | Mais recente |
+| --- | --: | --: | --- |
+| HGBS — Bauru Shopping | 2 de 12 | 17% | 02/2026 |
+| Edifício O Parque | 1 de 12 | 8% | 12/2025 |
+| Ed. Eldorado | 1 de 12 | 8% | 12/2025 |
+| JW Marriott Hotel | 1 de 12 | 8% | 12/2025 |
+| BRCR — Torre Almirante | 1 de 12 | 8% | 12/2025 |
+| TRX — O Parque | 0 de 12 | 0% | — |
+| CPOF — Ed. FL Plaza | 0 de 12 | 0% | — |
+| HSLG — BTS Meli | 0 de 12 | 0% | — |
 
 ## O "informe mensal" que é anual
 
-Foi o que apareceu ao datar o eixo. Opea e VERT publicam, na área aberta do agente fiduciário, um
+É o que a cadência revela. Opea e VERT publicam, na área aberta do agente fiduciário, um
 `Informe_Mensal` por ano, sempre referente a dezembro:
 
 | Operação | Informes na área aberta |
@@ -103,11 +121,13 @@ mensais com LTV, índice de cobertura e status dos fundos, correndo mês a mês 
 
 ## O que o score não captura
 
-- **Frequência, não só idade.** Os prazos olham a evidência mais recente. Quem publicou uma vez em
-  12/2025 e quem publicou todo mês até 12/2025 pontuam igual, embora o segundo esteja num regime
-  de acompanhamento e o primeiro não.
-- **Envelhecimento em degrau.** Um informe de 5 meses vale 2 e um de 6 vale 1. O corte é abrupto
-  onde a realidade é contínua.
+- **Envelhecimento em degrau.** Um informe de 5 meses vale 2 e um de 6 vale 1; cinco competências
+  em doze meses valem 1 e seis valem 2. Os cortes são abruptos onde a realidade é contínua.
+- **A cadência é medida pelo nome do arquivo.** A competência de cada documento é deduzida do
+  nome, porque os portais expõem data de upload e não data de referência. Formato novo que não
+  case com os padrões conhecidos passa despercebido e subestima a operação.
+- **Só o teto do eixo é afetado.** Irregularidade derruba de público para parcial, nunca para
+  ausente: quem publica pouco ainda publica algo, e isso vale mais do que silêncio.
 - **Qualidade do que está publicado.** O termo do Eldorado está público mas cortado, sem o Anexo
   IX. Ele pontua 2 no eixo Termo e 1 no eixo Devedora, o que só parcialmente reflete o problema.
 - **Assimetria entre investidor profissional e cotista.** Boa parte destes documentos existe em

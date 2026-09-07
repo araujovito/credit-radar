@@ -52,16 +52,20 @@ garantias, cobertura, demonstrações e acompanhamento.
 - **R$ 392,3 mi (40% do recorte)** está em operações onde nem a devedora é identificável.
 - **93% do recorte** não tem LTV nem índice de cobertura publicado.
 - **Nenhuma das oito** tem demonstrações financeiras da devedora.
-- **Nenhuma das oito** tem acompanhamento corrente: três não publicam nada e as outras cinco estão
-  com o informe mais recente entre 6 e 8 meses atrás.
+- **6 informes publicados em doze meses, contra 96 exigidos** — regularidade de 6%. Três operações
+  não publicaram nada, cinco publicaram uma ou duas competências, nenhuma está em dia.
 
 A ponderação piora o número em relação à média simples (40%) porque as duas operações mais
 opacas são a segunda e a terceira maiores do recorte. Quanto maior o cheque, menos se sabe.
 
-**Evidência vence.** Cobertura cai para parcial com 18 meses; acompanhamento, com 6. Foi ao datar
-o segundo eixo que apareceu o problema: o `Informe_Mensal` que os agentes fiduciários publicam na
-área aberta é, na prática, **um documento por ano, sempre referente a dezembro**. O nome diz
-mensal, a regra é mensal, a publicação é anual — e entre março e dezembro quem consulta está
+**Evidência vence, e idade não é frequência.** Cobertura cai para parcial com 18 meses.
+Acompanhamento cai com 6 meses **ou** com cadência abaixo de metade do exigido — porque quem
+publicou uma vez em dezembro e quem publicou todo mês até dezembro têm a mesma última evidência e
+regimes opostos.
+
+Foi assim que apareceu o problema: o `Informe_Mensal` que os agentes fiduciários publicam na área
+aberta é, na prática, **um documento por ano, sempre referente a dezembro**. O nome diz mensal, a
+Resolução CVM 60 pede mensal, a publicação é anual — e entre março e dezembro quem consulta está
 olhando dados de até doze meses atrás.
 
 Detalhamento por eixo e limites do modelo em
@@ -130,8 +134,8 @@ React + TypeScript  ->  Spring Boot API  ->  PostgreSQL
    palavra-chave responde HTTP 500, então o repositório oficial não permite a consulta.
 2. Ler os relatórios de garantia das demais operações para medir cobertura, hoje disponível
    apenas para Torre Almirante.
-3. Medir frequência, não só idade: quem publicou uma vez em 12/2025 e quem publicou todo mês até
-   12/2025 pontuam igual hoje, embora só o segundo esteja em regime de acompanhamento.
+3. Trocar `ddl-auto: update` por migrações versionadas. Adicionar a coluna de cadência quebrou a
+   subida da API, porque o Hibernate não consegue criar coluna `not null` em tabela com linhas.
 4. Só então repetir o processo para outros FIIs.
 
 Em `infra/` há a base para executar a API em ECS Fargate com RDS PostgreSQL. Antes de aplicar,

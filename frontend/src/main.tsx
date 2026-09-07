@@ -10,10 +10,12 @@ type Concentration={byIssuer:Record<string,number>};
 type Insights={importedPositions:number;largestEconomicGroup:string;largestEconomicGroupAmountMillions:number;largestEconomicGroupPercent:number;largestSector:string};
 type GroupProfile={id:number;name:string;sector:string;publicStatus:string;ticker:string;sourceUrl:string;relationshipNote:string;confidence:string};
 type TAxis={key:string;label:string;question:string};
-type TOperation={slug:string;operationName:string;creditCode:string;amountMillions:number;levels:Record<string,number>;points:number;percent:number;gapNote:string;coverage:TDated;monitoring:TDated};
+type TOperation={slug:string;operationName:string;creditCode:string;amountMillions:number;levels:Record<string,number>;points:number;percent:number;gapNote:string;coverage:TDated;monitoring:TMonitoring};
 type TDated={asOf:string|null;ageMonths:number|null;stale:boolean};
+type TMonitoring=TDated&{published12m:number;expected12m:number;regularity:number;irregular:boolean};
+type TCadence={published12m:number;expected12m:number;regularity:number;silent:number;irregular:number};
 type TExposure={operations:number;amountMillions:number;percent:number;names:string[]};
-type TReport={axes:TAxis[];operations:TOperation[];portfolio:{operations:number;amountMillions:number;simpleScore:number;weightedScore:number;withoutDebtor:TExposure;withCoverage:TExposure;withoutTerm:TExposure;staleCoverage:TExposure;staleMonitoring:TExposure}|null};
+type TReport={axes:TAxis[];operations:TOperation[];portfolio:{operations:number;amountMillions:number;simpleScore:number;weightedScore:number;cadence:TCadence;withoutDebtor:TExposure;withCoverage:TExposure;withoutTerm:TExposure;staleCoverage:TExposure;staleMonitoring:TExposure;irregularMonitoring:TExposure}|null};
 type Coverage={slug:string;asOfDate:string;scope:string;collateralValue:number;securedBalance:number;coveragePercent:number;method:string;caveat:string;sourceNote:string};
 type DebtorResearch={id:number;debtor:string;status:string;sourceUrl:string};
 type CriDocument={id:number;creditCode:string;operationName:string;issuer:string;sourceType:string;availability:string;finding:string;sourceUrl:string};
@@ -58,10 +60,14 @@ const LEVEL_LABEL=['Ausente','Parcial','Público'];
 function dated(o:TOperation,key:string):TDated|null{return key==='coverage'?o.coverage:key==='monitoring'?o.monitoring:null}
 function Cell({axis,operation}:{axis:TAxis;operation:TOperation}){
  const level=operation.levels[axis.key]; const d=dated(operation,axis.key);
- const aged=d&&d.stale&&d.asOf;
+ const m=axis.key==='monitoring'?operation.monitoring:null;
  const when=d&&d.asOf?new Date(d.asOf+'T12:00:00').toLocaleDateString('pt-BR'):null;
- return <em className={`cell ${LEVELS[level]}`} title={`${axis.label}: ${LEVEL_LABEL[level]}${when?` — última evidência em ${when}`:''} — ${axis.question}`}>
-  {LEVEL_LABEL[level]}{aged?<i className="stale"> · {d!.ageMonths}m</i>:null}
+ const mark=m?(m.published12m>0?`${m.published12m}/${m.expected12m}`:null):(d&&d.stale&&d.asOf?`${d.ageMonths}m`:null);
+ const why=m
+  ?`${m.published12m} de ${m.expected12m} competências publicadas em 12 meses${when?`; a mais recente refere-se a ${when}`:''}`
+  :(when?`última evidência em ${when}`:'');
+ return <em className={`cell ${LEVELS[level]}`} title={`${axis.label}: ${LEVEL_LABEL[level]}${why?` — ${why}`:''} — ${axis.question}`}>
+  {LEVEL_LABEL[level]}{mark?<i className="stale"> · {mark}</i>:null}
  </em>;
 }
 function TransparencySection({report}:{report:TReport}){
@@ -72,7 +78,7 @@ function TransparencySection({report}:{report:TReport}){
   <div className="score-big"><strong>{p.weightedScore}%</strong><span>ponderado pela exposição</span><small>{p.simpleScore}% na média simples · {p.operations} operações · R$ {p.amountMillions.toLocaleString('pt-BR')} mi</small></div>
   <div className="score-facts">
    <div className="fact bad"><b>R$ {p.withoutDebtor.amountMillions.toLocaleString('pt-BR')} mi · {p.withoutDebtor.percent}%</b><span>em operações onde nem a devedora é identificável em fonte aberta</span><small>{p.withoutDebtor.names.join(' · ')}</small></div>
-   <div className="fact warn"><b>{p.staleMonitoring.operations} de {p.operations} operações</b><span>sem acompanhamento corrente: o informe mais recente na área aberta tem mais de 6 meses</span><small>{p.staleMonitoring.names.join(' · ')}</small></div>
+   <div className="fact bad"><b>{p.cadence.published12m} de {p.cadence.expected12m} informes · {p.cadence.regularity}%</b><span>é tudo o que as oito operações publicaram em doze meses, contra uma competência por mês exigida de cada uma</span><small>{p.cadence.silent} não publicaram nada · {p.cadence.irregular} publicaram abaixo de metade do exigido · nenhuma em dia</small></div>
    <div className="fact bad"><b>{100-p.withCoverage.percent}% do recorte</b><span>sem LTV ou índice de cobertura publicado</span><small>Só {p.withCoverage.names.join(' · ')} tem apuração, e ela venceu: caiu para parcial por ter mais de 18 meses</small></div>
   </div>
  </div>

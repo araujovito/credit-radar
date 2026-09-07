@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
   new Axis("guarantees","Garantias","As garantias estão descritas em documento primário, e não só listadas em cadastro?"),
   new Axis("coverage","Cobertura","Há LTV ou índice de cobertura publicado, e recente, para aferir a garantia? Uma apuração com mais de 18 meses vale como parcial."),
   new Axis("financials","Demonstrações","Há demonstrações financeiras da devedora?"),
-  new Axis("monitoring","Acompanhamento","Há relatório ou informe periódico público e recente? Informe com mais de 6 meses vale como parcial."));
+  new Axis("monitoring","Acompanhamento","Há acompanhamento periódico público, recente e regular? Informe com mais de 6 meses, ou cadência abaixo de metade do exigido, vale como parcial."));
  private final TransparencyScoreRepository scores;
  public TransparencyController(TransparencyScoreRepository scores){this.scores=scores;}
 
@@ -26,17 +26,25 @@ import org.springframework.web.bind.annotation.*;
     Map.of("debtor",s.getDebtor(),"term",s.getTerm(),"guarantees",s.getGuarantees(),"coverage",s.getEffectiveCoverage(today),"financials",s.getFinancials(),"monitoring",s.getEffectiveMonitoring(today)),
     s.getPoints(today),s.getPercent(today),s.getGapNote(),
     new Dated(s.getCoverageAsOf(),s.getCoverageAgeMonths(today),s.isCoverageStale(today)),
-    new Dated(s.getMonitoringAsOf(),s.getMonitoringAgeMonths(today),s.isMonitoringStale(today)))).toList();
+    new Monitoring(s.getMonitoringAsOf(),s.getMonitoringAgeMonths(today),s.isMonitoringStale(today),
+     s.getMonitoringPublished12m(),s.getMonitoringExpected12m(),s.getMonitoringRegularity()==null?null:pct(s.getMonitoringRegularity()),s.isMonitoringIrregular()))).toList();
   var weighted=rows.stream().map(s->s.getAmountMillions().multiply(BigDecimal.valueOf(s.getPoints(today))))
     .reduce(BigDecimal.ZERO,BigDecimal::add)
     .multiply(BigDecimal.valueOf(100)).divide(total.multiply(BigDecimal.valueOf(TransparencyScore.MAX)),0,RoundingMode.HALF_UP);
   var simple=BigDecimal.valueOf(rows.stream().mapToInt(s->s.getPoints(today)).sum()*100L)
     .divide(BigDecimal.valueOf((long)rows.size()*TransparencyScore.MAX),0,RoundingMode.HALF_UP);
-  var portfolio=new Portfolio(rows.size(),total,simple,weighted,
-    exposure(rows,s->s.getDebtor()==0,total),exposure(rows,s->s.getCoverage()>0,total),exposure(rows,s->s.getTerm()==0,total),exposure(rows,s->s.isCoverageStale(today),total),exposure(rows,s->s.isMonitoringStale(today),total));
+  var measured=rows.stream().filter(TransparencyScore::isMonitoringMeasured).toList();
+  var published=measured.stream().mapToInt(TransparencyScore::getMonitoringPublished12m).sum();
+  var expected=measured.size()*TransparencyScore.MONITORING_EXPECTED_PER_YEAR;
+  var cadence=new Cadence(published,expected,pct(expected==0?0:(double)published/expected),
+    (int)measured.stream().filter(s->s.getMonitoringPublished12m()==0).count(),
+    (int)rows.stream().filter(TransparencyScore::isMonitoringIrregular).count(),measured.size());
+  var portfolio=new Portfolio(rows.size(),total,simple,weighted,cadence,
+    exposure(rows,s->s.getDebtor()==0,total),exposure(rows,s->s.getCoverage()>0,total),exposure(rows,s->s.getTerm()==0,total),exposure(rows,s->s.isCoverageStale(today),total),exposure(rows,s->s.isMonitoringStale(today),total),exposure(rows,TransparencyScore::isMonitoringIrregular,total));
   return new Report(AXES,ops,portfolio);
  }
 
+ private static BigDecimal pct(double value){return BigDecimal.valueOf(value*100).setScale(0,RoundingMode.HALF_UP);}
  private Exposure exposure(List<TransparencyScore> rows,java.util.function.Predicate<TransparencyScore> match,BigDecimal total){
   var picked=rows.stream().filter(match).toList();
   var amount=picked.stream().map(TransparencyScore::getAmountMillions).reduce(BigDecimal.ZERO,BigDecimal::add);
@@ -46,8 +54,10 @@ import org.springframework.web.bind.annotation.*;
 
  public record Axis(String key,String label,String question){}
  public record Dated(LocalDate asOf,Long ageMonths,boolean stale){}
- public record Operation(String slug,String operationName,String creditCode,BigDecimal amountMillions,Map<String,Integer> levels,int points,BigDecimal percent,String gapNote,Dated coverage,Dated monitoring){}
+ public record Monitoring(LocalDate asOf,Long ageMonths,boolean stale,Integer published12m,int expected12m,BigDecimal regularity,boolean irregular){}
+ public record Operation(String slug,String operationName,String creditCode,BigDecimal amountMillions,Map<String,Integer> levels,int points,BigDecimal percent,String gapNote,Dated coverage,Monitoring monitoring){}
  public record Exposure(int operations,BigDecimal amountMillions,BigDecimal percent,List<String> names){}
- public record Portfolio(int operations,BigDecimal amountMillions,BigDecimal simpleScore,BigDecimal weightedScore,Exposure withoutDebtor,Exposure withCoverage,Exposure withoutTerm,Exposure staleCoverage,Exposure staleMonitoring){}
+ public record Cadence(int published12m,int expected12m,BigDecimal regularity,int silent,int irregular,int measured){}
+ public record Portfolio(int operations,BigDecimal amountMillions,BigDecimal simpleScore,BigDecimal weightedScore,Cadence cadence,Exposure withoutDebtor,Exposure withCoverage,Exposure withoutTerm,Exposure staleCoverage,Exposure staleMonitoring,Exposure irregularMonitoring){}
  public record Report(List<Axis> axes,List<Operation> operations,Portfolio portfolio){}
 }
