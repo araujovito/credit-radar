@@ -23,6 +23,7 @@ renderizada não serve como fonte. Cada coletor vai à camada de dados por onde 
 | `provincia.py` | Província | postback ASP.NET que libera o link do `FileHandler` |
 | `oliveiratrust.py` | Oliveira Trust | API aberta da área do investidor, busca por código IF |
 | `quotes.py` | B3, via série histórica | preço e volume de FIIs listados dados em garantia |
+| `fnet.py` | Fundos.NET / B3 | demonstrações financeiras e laudos de FIIs por CNPJ |
 
 O passo que mais rendeu foi a busca da Vórtx. Ela traduz o código IF para o id interno que todas
 as outras rotas exigem, e foi assim que apareceram Torre Almirante e Eldorado — que este projeto
@@ -56,21 +57,22 @@ Calcula a cobertura do CRI HGBS/Bauru, que o agente fiduciário não publica. Cr
 das duas séries com o valor de mercado das cotas de HPDP11 e FLRP11 dadas em garantia, cujas
 quantidades vêm do termo de securitização.
 
-Resultado em 04/09/2026: **66,5% de cobertura parcial** — R$ 64,2 mi de garantia mensurável contra
-R$ 96,5 mi de saldo. Parcial porque fica de fora a alienação fiduciária de 35% do Shopping Bauru,
-que não tem avaliação pública.
+Resultado em 04/09/2026: **164,0% de cobertura estimada** — R$ 158,7 mi de garantias contra
+R$ 96,5 mi de saldo. O cálculo soma R$ 64,2 mi em cotas empenhadas e R$ 94,5 mi referentes a 35%
+do Boulevard Shopping Bauru, com base em laudo Capright publicado pelo HGBS11 no FNET. Fundos de
+reserva e despesas ficam fora. A participação minoritária foi tomada proporcionalmente e pode não
+valer pro rata em uma execução.
 
 O script também reporta liquidez, e é aí que o número perde parte do sentido: as 1.969.834 cotas
 de FLRP11 empenhadas equivalem a **6,1 vezes todo o giro do papel em doze meses**. Preço de tela é
 marcação, não valor de saída.
 
-## O que não funcionou
+## Limites do FNET/CVM
 
-Não há coletor para o FNET/CVM porque a busca é inútil na prática. O endpoint
-`pesquisarGerenciadorDocumentosDados` aceita filtro por CNPJ mas o ignora — a contagem de
-resultados não muda —, e `palavraChave`, o único filtro que serviria para achar documentos de uma
-emissão específica, responde HTTP 500. As categorias cobrem FII, FIDC e ETF; CRI só se alcança
-pela busca textual, que está quebrada.
+O coletor `fnet.py` consulta documentos de FII e FIDC pelo campo `cnpjFundo`; por isso ele permite
+localizar demonstrações financeiras e laudos quando a devedora é um fundo identificado. A busca
+textual `palavraChave` continua retornando HTTP 500, e CRI não pode ser encontrado pelo CNPJ da
+securitizadora nesse fluxo.
 
-É por isso que as devedoras de FL Plaza e BTS Meli seguem "A confirmar". Não é pendência de
-pesquisa: é o repositório oficial não permitindo a consulta.
+Por isso as devedoras de FL Plaza e BTS Meli seguem “A confirmar”: falta identificar a entidade
+jurídica no termo ou em fonte primária, não apenas consultar o cadastro da securitizadora.
