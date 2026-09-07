@@ -25,7 +25,7 @@ public class CreditRiskController {
    else if(collateral.equals("CALCULADA AQUI")){points+=20;reasons.add("cobertura estimada pelo projeto, sem validação do agente fiduciário");}
    if("INADIMPLENTE".equals(d.getPaymentStatus())){points+=40;reasons.add("inadimplemento registrado pelo agente fiduciário");}
    else if(!"ADIMPLENTE".equals(d.getPaymentStatus())){points+=5;reasons.add("status de pagamento sem confirmação direta");}
-   if(d.getLegalName().startsWith("A confirmar")||d.getCnpj().startsWith("A confirmar")){points+=15;reasons.add("devedora jurídica ou CNPJ não identificados");}
+   if(d.getLegalName().startsWith("A confirmar")||d.getLegalName().equals("Pesquisa não iniciada")||d.getCnpj().startsWith("A confirmar")){points+=15;reasons.add(d.getLegalName().equals("Pesquisa não iniciada")?"diligência documental ainda não iniciada":"devedora jurídica ou CNPJ não identificados");}
    var amount=amounts.getOrDefault(d.getSlug(),BigDecimal.ZERO); if(amount.compareTo(BigDecimal.valueOf(100))>=0){points+=10;reasons.add("exposição material acima de R$ 100 mi");}
    var coverage=coverages.findBySlug(d.getSlug()).orElse(null); if(coverage!=null&&coverage.getCoveragePercent().compareTo(BigDecimal.valueOf(100))<0){points+=25;reasons.add("cobertura calculada abaixo de 100%");}
    var priority=points>=60?"CRÍTICA":points>=35?"ALTA":points>=20?"MÉDIA":"MONITORAR";
