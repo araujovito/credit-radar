@@ -4,8 +4,10 @@ terraform {
 }
 provider "aws" { region = var.aws_region }
 
-resource "aws_ecr_repository" "api" { name = "credit-radar-api" force_delete = true }
-
+resource "aws_ecr_repository" "api" {
+  name         = "credit-radar-api"
+  force_delete = true
+}
 resource "aws_db_instance" "postgres" {
   identifier              = "credit-radar-postgres"
   engine                  = "postgres"
