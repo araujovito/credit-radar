@@ -4,15 +4,15 @@ terraform {
 }
 provider "aws" { region = var.aws_region }
 
-resource "aws_ecr_repository" "api" { name = "devfinance-api" force_delete = true }
+resource "aws_ecr_repository" "api" { name = "credit-radar-api" force_delete = true }
 
 resource "aws_db_instance" "postgres" {
-  identifier              = "devfinance-postgres"
+  identifier              = "credit-radar-postgres"
   engine                  = "postgres"
   engine_version          = "16"
   instance_class          = "db.t4g.micro"
   allocated_storage       = 20
-  db_name                 = "devfinance"
+  db_name                 = "creditradar"
   username                = var.db_username
   password                = var.db_password
   publicly_accessible     = false
